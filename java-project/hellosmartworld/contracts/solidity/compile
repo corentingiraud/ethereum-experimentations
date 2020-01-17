@@ -1,0 +1,2 @@
+#!/bin/bash
+solc Mirror.sol --bin --abi --optimize -o ../build
