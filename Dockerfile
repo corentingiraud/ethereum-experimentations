@@ -1,6 +1,5 @@
 FROM ubuntu:bionic
 
-
 WORKDIR /root
 
 RUN apt-get update
