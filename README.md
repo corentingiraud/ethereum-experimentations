@@ -26,7 +26,7 @@ To obtain bash command line interface inside the container:
 From `~/.ethereum` directory:
 ```
 cd ~/.ethereum/
-geth account new
+geth --datadir chaine1T account new
 ```
 
 Save `Public address of the key` and `Path of the secret key file` output for future use inside your dApp.
@@ -54,6 +54,7 @@ Go inside the `java-projects` directory and choose a project.
 Go inside a project.
 To compile source code to `.jar` file (including dependencies), use:
 `mvn clean install`
+To lunch a compiled project: `java -cp ./target/X-SNAPSHOT-jar-with-dependencies.jar fr.insa.smarties.Launcher`
 
 If a project miss dependencies, add the following code snippet to the `pom.xml` file in the root of your maven project.
 ```xml
