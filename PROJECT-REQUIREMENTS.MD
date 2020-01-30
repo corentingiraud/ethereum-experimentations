@@ -5,7 +5,7 @@
 - smart contracts
 - Garanteed conditional execution
 - stateful
-- Distributed (min 2 nodes)
+- (Distributed (min 2 nodes)) nop
 
 ## Livrable
 
