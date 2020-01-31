@@ -134,6 +134,7 @@ class Menu {
             System.out.println(ANSI_GREEN + "Calling smart contract function in the blockchain..." + ANSI_RESET);
             Will will = new Will(amount, heirs, this._currentAccount);
             System.out.println("Will address: " + will.getAddress());
+            this._currentWill = will;
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Exception raised during account initialization. Please try again");

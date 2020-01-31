@@ -61,14 +61,12 @@ public class Will {
 
     public int removeEthFromInheritance(int ethToRemove) throws Exception {
         BigInteger value = BigInteger.valueOf(ethToRemove).multiply(BigInteger.valueOf(10).pow(18));
-        TransactionReceipt trReceipt = this._contract.removeWeiFromInheritance(value).send();
-        System.out.println(trReceipt.toString());
+        this._contract.removeWeiFromInheritance(value).send();
         return 0;
     }
 
     public int declareDead() throws Exception {
-        TransactionReceipt trReceipt = this._contract.declareDead().send();
-        System.out.println(trReceipt.toString());
+        this._contract.declareDead().send();
         return 0;
     }
 
