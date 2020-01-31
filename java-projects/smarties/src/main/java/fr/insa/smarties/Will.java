@@ -5,6 +5,7 @@ import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Convert;
 
 import java.math.BigInteger;
@@ -42,6 +43,8 @@ public class Will {
             heirAddrs,
             heirPercs)
         .send();
+
+        this._address = this._contract.getAddress().send();
     }
 
     public Will(String contractAddress, Credentials credentials) {
@@ -50,20 +53,22 @@ public class Will {
         this._contract = Smartie.load(contractAddress, Launcher.web3, credentials, DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT);
     }
 
-    public int addWeiToInheritance(int ethToAdd) throws Exception {
+    public int addEthToInheritance(int ethToAdd) throws Exception {
         BigInteger value = BigInteger.valueOf(ethToAdd).multiply(BigInteger.valueOf(10).pow(18));
         this._contract.addWeiToInheritance(value).send();
         return 0;
     }
 
-    public int removeWeiFromInheritance(int ethToRemove) throws Exception {
+    public int removeEthFromInheritance(int ethToRemove) throws Exception {
         BigInteger value = BigInteger.valueOf(ethToRemove).multiply(BigInteger.valueOf(10).pow(18));
-        this._contract.removeWeiFromInheritance(value).send();
+        TransactionReceipt trReceipt = this._contract.removeWeiFromInheritance(value).send();
+        System.out.println(trReceipt.toString());
         return 0;
     }
 
     public int declareDead() throws Exception {
-        this._contract.declareDead().send();
+        TransactionReceipt trReceipt = this._contract.declareDead().send();
+        System.out.println(trReceipt.toString());
         return 0;
     }
 
@@ -81,7 +86,7 @@ public class Will {
     }
 
     public String getAddress() throws Exception {
-        return this._contract.getAddress().send();
+        return this._address;
     }
 
     public String getBalance() throws InterruptedException, ExecutionException {

@@ -9,11 +9,14 @@ contract smartie {
 
     address owner;
     Heir[] public heirs;
+    uint256 inheritanceValue;
+
+
     address[] heirsThatDeclaredDead;
     uint countClaimPercentage;
-    uint256 inheritanceValue;
     bool public isDead;
     uint public deathDate;
+    bool public isClaimed;
 
     event LogCoinsSent(address sentTo, uint amount);
     event LogDeath(bool isDead, uint nbOfValid);
@@ -39,6 +42,7 @@ contract smartie {
         require(totalPercentage == 100, 'Total percentage not equal to 100');
         owner = msg.sender;
         isDead = false;
+        isClaimed = false;
         countClaimPercentage = 0;
         // Set funds
         inheritanceValue = msg.value;
@@ -62,15 +66,18 @@ contract smartie {
                 return 'The heir officially declared the owner dead. Other heirs will need to declare the owner dead.';
             }
         }
-    } 
+    }
 
     function claimWill() public {
-        require(isDead, 'The owner is not officially dead. Heirs representing at least 80% of the inheritance need to declare the owner dead');
-        require((deathDate) <= block.timestamp, 'The latency needed for the will to be claimed is not yet reached, you will have to wait');
+        require(isDead, 'The owner is not officially declared dead.');
+        require((deathDate + 2 minutes) <= block.timestamp, 'The latency needed for the will to be claimed is not yet reached.');
+        require(isClaimed == false, "Can/'t claim will in destructed contract");
         executeContract();
+        isClaimed = true;
     }
 
     function addWeiToInheritance() public payable returns(uint256) {
+        require(isClaimed == false, "Can/'t add Wei to destructed contract");
         require(msg.sender == owner, 'Only the owner of the contract can add ether');
         require(msg.value >= 1, 'Not enough wei provided');
         inheritanceValue += msg.value;
@@ -121,4 +128,5 @@ contract smartie {
     function getOwner() public view returns(address) {
         return owner;
     }
+
 }

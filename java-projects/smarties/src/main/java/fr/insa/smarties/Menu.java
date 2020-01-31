@@ -4,6 +4,15 @@ import java.io.Console;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Optional; 
+import java.util.Arrays;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.EthCall;
+import org.web3j.abi.datatypes.Utf8String;
 
 class Menu {
     public static final String ANSI_RESET = "\u001B[0m";
@@ -13,16 +22,36 @@ class Menu {
     public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 
     private Account _currentAccount;
+    private Will _currentWill;
     
     public Menu() {
         System.out.println(this.ANSI_WHITE_BACKGROUND + this.ANSI_BLACK + "*************** Smarties DAPP: Smart contract for will managment. ***************" + this.ANSI_RESET);
         this.changeAccount();
+        this._currentWill = this.askWillAddress();
     }
 
     public int mainMenu() {
         int choice = 0;
         do {
+            System.out.println();
             System.out.println(this.ANSI_WHITE_BACKGROUND + this.ANSI_BLACK + "******************* SmartiesDApp - Main MENU *******************" + this.ANSI_RESET);
+            try {
+                System.out.println("Current account : " + this._currentAccount.getAddress());
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Exception raised during account initialization. Please try again");
+            }
+            if (this._currentWill != null) {
+                try {
+                    System.out.println("Current will : " + this._currentWill.getAddress());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Exception raised during will initialization. Please try again");
+                }
+            } else {
+                System.out.println("No current will");
+            }
+            System.out.println();
             System.out.println("1- Load another ethereum account");
             System.out.println("2- Write a new will");
             System.out.println("3- Edit a will");
@@ -63,6 +92,7 @@ class Menu {
 
         } while (choice != 0);
         return 0;
+        
     }
 
     private int changeAccount() {
@@ -101,6 +131,7 @@ class Menu {
         }
 
         try {
+            System.out.println(ANSI_GREEN + "Calling smart contract function in the blockchain..." + ANSI_RESET);
             Will will = new Will(amount, heirs, this._currentAccount);
             System.out.println("Will address: " + will.getAddress());
         } catch (Exception e) {
@@ -119,7 +150,7 @@ class Menu {
         scanner = new Scanner(System.in);
         int heirPercentage = scanner.nextInt();
         while(heirPercentage > 100 || heirPercentage < 0 ) {
-            System.out.println(ANSI_RED + "Error : percentage must be an integer between 0 and 100 " + ANSI_RESET );
+            System.out.println(ANSI_RED + "Error : percentage must be an integer between 0 and 100 " + ANSI_RESET);
             System.out.println("Percentage :");
             scanner = new Scanner(System.in);
             heirPercentage = scanner.nextInt();
@@ -128,13 +159,12 @@ class Menu {
     }
 
     private int editWill() {
-        Will will = this.askWillAddress();
-
         int choice = 0;
 
         do {
-            System.out.println("1- Add wei to will");
-            System.out.println("2- Remove wei from will");
+            System.out.println("1- Add ether to will");
+            System.out.println("2- Remove ether from will");
+            System.out.println("3- Show will balance");
             System.out.println("0- Exit");
 
             Scanner scanner = new Scanner(System.in);
@@ -146,10 +176,11 @@ class Menu {
                     scanner = new Scanner(System.in);
                     int amount = scanner.nextInt();
                     try {
-                        will.addWeiToInheritance(amount);
+                        System.out.println(ANSI_GREEN + "Calling smart contract function in the blockchain..." + ANSI_RESET);
+                        this._currentWill.addEthToInheritance(amount);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        System.out.println("Exception raised during account addWeiToInheritance. Please try again");
+                        System.out.println("Exception raised during account addEtherToInheritance. Please try again");
                         return 0;
                     }
                     break;
@@ -158,12 +189,16 @@ class Menu {
                     scanner = new Scanner(System.in);
                     amount = scanner.nextInt();
                     try {
-                        will.removeWeiFromInheritance(amount);
+                        System.out.println(ANSI_GREEN + "Calling smart contract function in the blockchain..." + ANSI_RESET);
+                        this._currentWill.removeEthFromInheritance(amount);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        System.out.println("Exception raised during account removeWeiFromInheritance. Please try again");
+                        System.out.println("Exception raised during account removeEtherFromInheritance. Please try again");
                         return 0;
                     }
+                    break;
+                case 3:
+                    this.showWillBalance();
                     break;
                 default:
                     break;
@@ -176,8 +211,8 @@ class Menu {
 
     private int declareDead() {
         try {
-            Will will = this.askWillAddress();
-            will.declareDead(); 
+            System.out.println(ANSI_GREEN + "Calling smart contract function in the blockchain..." + ANSI_RESET);
+            this._currentWill.declareDead();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Exception raised during account askWillAddress. Please try again");
@@ -187,8 +222,8 @@ class Menu {
 
     private int claimInheritance() {
         try {
-            Will will = this.askWillAddress();
-            will.claimInheritance();   
+            System.out.println(ANSI_GREEN + "Calling smart contract function in the blockchain..." + ANSI_RESET);
+            this._currentWill.claimInheritance();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Exception raised during account claimInheritance. Please try again");
@@ -198,7 +233,7 @@ class Menu {
 
     private int showAccountBalance() {
         try {
-            System.out.println(this._currentAccount.getBalance());
+            System.out.println(this._currentAccount.getBalance() + " Ether");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Exception raised during account getBalance. Please try again");
@@ -207,9 +242,8 @@ class Menu {
     }
 
     private int showWillBalance() {
-        Will will = this.askWillAddress();
         try {
-            System.out.println(will.getBalance());
+            System.out.println(this._currentWill.getBalance() + " Ether");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Exception raised during will getBalance. Please try again");
@@ -218,7 +252,6 @@ class Menu {
     }
 
     private Will askWillAddress() {
-
         System.out.println("Will address :");
         Scanner scanner = new Scanner(System.in);
         String willAddress = scanner.nextLine();

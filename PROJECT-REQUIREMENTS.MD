@@ -12,7 +12,7 @@
 ### PDF 1
 
 - Initialisation: intro, team, rétro-planning
-- Spec: Use case diagram, description, IHM
+- Spec: Use case diagram, description
 - Design: class diagram, sequence diagram, state diagram, solidity signatures
 
 ### PDF 2
